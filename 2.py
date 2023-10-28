@@ -109,7 +109,6 @@ def test_dogs_limit(db_connection, create_tables):
         cursor.execute(f"INSERT INTO dogs (name, breed) VALUES ('Dog {i}', 'Breed {i}');")
     db_connection.commit()
 
-    # Пытаемся вставить еще одну собаку
     with pytest.raises(sqlite3.IntegrityError):
         cursor.execute("INSERT INTO dogs (name, breed) VALUES ('Dog 6', 'Breed 6');")
         db_connection.commit()
@@ -118,13 +117,11 @@ def test_dogs_limit(db_connection, create_tables):
 def test_dogs_sorted_by_name(db_connection, create_tables):
     cursor = db_connection.cursor()
 
-    # Вставляем неотсортированных собак
     cursor.execute("INSERT INTO dogs (name, breed) VALUES ('Bob', 'Breed1');")
     cursor.execute("INSERT INTO dogs (name, breed) VALUES ('Alice', 'Breed2');")
     cursor.execute("INSERT INTO dogs (name, breed) VALUES ('Charlie', 'Breed3');")
     db_connection.commit()
 
-    # Проверяем, что собаки отсортированы по имени
     cursor.execute("SELECT name FROM dogs ORDER BY name;")
     result = cursor.fetchall()
     expected_result = [('Alice',), ('Bob',), ('Charlie',)]
@@ -134,7 +131,6 @@ def test_dogs_sorted_by_name(db_connection, create_tables):
 def test_buyers_preferred_breeds_limit(db_connection, create_tables):
     cursor = db_connection.cursor()
 
-    # Вставляем покупателя с более чем 3 предпочтительными породами
     with pytest.raises(sqlite3.IntegrityError):
         cursor.execute("INSERT INTO buyers (name, preferred_breeds) VALUES ('Buyer1', 'Breed1, Breed2, Breed3, Breed4');")
         db_connection.commit()
@@ -143,7 +139,6 @@ def test_buyers_preferred_breeds_limit(db_connection, create_tables):
     cursor.execute("INSERT INTO buyers (name, preferred_breeds) VALUES ('Buyer2', 'Breed1, Breed2, Breed3');")
     db_connection.commit()
 
-    # Проверяем, что покупатель был успешно добавлен
     cursor.execute("SELECT * FROM buyers;")
     result = cursor.fetchall()
     assert len(result) == 1
